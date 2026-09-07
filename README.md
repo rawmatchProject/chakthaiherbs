@@ -204,13 +204,17 @@ pnpm payload migrate:create
 
 This creates the migration files you will need to push alongside with your new configuration.
 
-On the server after building and before running `pnpm start` you will want to run your migrations
+`pnpm build` runs pending migrations through its `prebuild` script **before** Next.js collects page data. The initial migration in `src/migrations` creates the Payload tables, including `pages`, `posts`, and the Blob media fields. Commit the migration TypeScript file, JSON snapshot, and index together.
+
+To run migrations separately:
 
 ```bash
-pnpm payload migrate
+pnpm migrate
 ```
 
 This command will check for any migrations that have not yet been run and try to run them and it will keep a record of migrations that have been run in the database.
+
+Use `pnpm build` as the Vercel Build Command so that `prebuild` runs. The build requires database credentials with permission to apply the schema. This initial migration is for a database without the application's existing tables; a database already populated through development schema push needs its migration history reconciled first.
 
 ### Docker
 
@@ -272,6 +276,8 @@ Vercel Blob is configured for the `media` collection in `src/plugins/index.ts`, 
 1. In your Vercel project's Storage section, create or connect a **public** Blob store.
 2. Enable the integration for the deployment environments you use and confirm `BLOB_READ_WRITE_TOKEN` is set.
 3. Redeploy the project, then upload an image in Payload Admin's Media collection.
+
+If the build still warns that `media` has no storage adapter, the Blob token is missing or empty in that deployment environment. Check the Production or Preview scope of `BLOB_READ_WRITE_TOKEN` and redeploy after connecting the store.
 
 For local Blob uploads, set the same server-only variable in `.env`. With no token, uploads use `public/media` locally. The plugin keeps its schema fields present in both environments; include those changes in your normal Payload migration workflow before production deployment. Existing local uploads are not automatically transferred to Blob and must be uploaded again or migrated separately.
 
