@@ -244,27 +244,38 @@ To run Payload in production, you need to build and start the Admin panel. To do
 
 ### Deploying to Vercel
 
-This template can also be deployed to Vercel for free. You can get started by choosing the Vercel DB adapter during the setup of the template or by manually installing and configuring it:
+This project uses the standard PostgreSQL adapter, including when deployed to Vercel. It connects over TCP and supports Prisma Postgres. The Vercel Postgres adapter uses a Neon WebSocket transport for remote databases, which fails against Prisma Postgres with `wss://db.prisma.io/v2` returning HTTP 404.
 
 ```bash
-pnpm add @payloadcms/db-vercel-postgres
+pnpm add @payloadcms/db-postgres@3.88.0
 ```
 
 ```ts
 // payload.config.ts
-import { vercelPostgresAdapter } from '@payloadcms/db-vercel-postgres'
+import { postgresAdapter } from '@payloadcms/db-postgres'
 
 export default buildConfig({
   // ...
-  db: vercelPostgresAdapter({
+  db: postgresAdapter({
     pool: {
-      connectionString: process.env.POSTGRES_URL || '',
+      connectionString: process.env.POSTGRES_URL || process.env.DATABASE_URL || '',
     },
   }),
   // ...
+})
 ```
 
-We also support Vercel's blob storage:
+Set `POSTGRES_URL` in the Vercel environment to your PostgreSQL TCP connection string (`postgres://` or `postgresql://`, including the provider's SSL parameters). `DATABASE_URL` is used only if `POSTGRES_URL` is unset. Prisma Accelerate URLs (`prisma://` or `prisma+postgres://`) cannot be used by this adapter. The database must be reachable and have the Payload schema before building, because static page generation queries it.
+
+Vercel Blob is configured for the `media` collection in `src/plugins/index.ts`, including direct browser uploads. To activate it:
+
+1. In your Vercel project's Storage section, create or connect a **public** Blob store.
+2. Enable the integration for the deployment environments you use and confirm `BLOB_READ_WRITE_TOKEN` is set.
+3. Redeploy the project, then upload an image in Payload Admin's Media collection.
+
+For local Blob uploads, set the same server-only variable in `.env`. With no token, uploads use `public/media` locally. The plugin keeps its schema fields present in both environments; include those changes in your normal Payload migration workflow before production deployment. Existing local uploads are not automatically transferred to Blob and must be uploaded again or migrated separately.
+
+The installed storage plugin is configured as follows:
 
 ```bash
 pnpm add @payloadcms/storage-vercel-blob
@@ -279,12 +290,15 @@ export default buildConfig({
   plugins: [
     vercelBlobStorage({
       collections: {
-        [Media.slug]: true,
+        media: true,
       },
-      token: process.env.BLOB_READ_WRITE_TOKEN || '',
+      token: process.env.BLOB_READ_WRITE_TOKEN,
+      clientUploads: true,
+      alwaysInsertFields: true,
     }),
   ],
   // ...
+})
 ```
 
 There is also a simplified [one click deploy](https://github.com/payloadcms/payload/tree/3.x/templates/with-vercel-postgres) to Vercel should you need it.
