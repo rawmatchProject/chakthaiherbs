@@ -2,7 +2,8 @@ import { PreviewSearchParams } from '@/app/(frontend)/next/preview/route'
 import { PayloadRequest, CollectionSlug } from 'payload'
 
 const collectionPrefixMap: Partial<Record<CollectionSlug, string>> = {
-  posts: '/posts',
+  // The herbarium publishes articles at /news; the template's /posts archive is gone.
+  posts: '/news',
   pages: '',
 }
 

@@ -16,7 +16,9 @@ import { themeLocalStorageKey } from './types'
 
 export const ThemeSelector: React.FC = () => {
   const { setTheme } = useTheme()
-  const [value, setValue] = useState('')
+  const [value, setValue] = useState(() =>
+    typeof window === 'undefined' ? '' : (window.localStorage.getItem(themeLocalStorageKey) ?? 'auto'),
+  )
 
   const onThemeChange = (themeToSet: Theme & 'auto') => {
     if (themeToSet === 'auto') {
@@ -27,11 +29,6 @@ export const ThemeSelector: React.FC = () => {
       setValue(themeToSet)
     }
   }
-
-  React.useEffect(() => {
-    const preference = window.localStorage.getItem(themeLocalStorageKey)
-    setValue(preference ?? 'auto')
-  }, [])
 
   return (
     <Select onValueChange={onThemeChange} value={value}>

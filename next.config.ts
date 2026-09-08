@@ -19,9 +19,14 @@ const nextConfig: NextConfig = {
   },
   images: {
     localPatterns: [
-      {
-        pathname: '/api/media/file/**',
-      },
+      // Payload uploads
+      { pathname: '/api/media/file/**' },
+      // Design assets that belong to the site itself rather than the media
+      // catalogue: the wordmark, the app icons, and the photographs used as
+      // page furniture.
+      { pathname: '/brand/**' },
+      { pathname: '/icons/**' },
+      { pathname: '/site/**' },
     ],
     qualities: [100],
     remotePatterns: [

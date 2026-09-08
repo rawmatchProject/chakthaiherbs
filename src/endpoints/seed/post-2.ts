@@ -8,6 +8,7 @@ export const post2: (args: PostArgs) => RequiredDataFromCollectionSlug<'posts'> 
 }) => {
   return {
     slug: 'global-gaze',
+    excerpt: 'Demo content from the Payload website template.',
     _status: 'published',
     authors: [author],
     content: {

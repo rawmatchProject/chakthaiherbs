@@ -15,10 +15,22 @@ const initialContext: ThemeContextType = {
 
 const ThemeContext = createContext(initialContext)
 
+/**
+ * The reader's stored preference, or what their OS implies. Read once, lazily,
+ * rather than assigned from inside an effect — setting state synchronously in
+ * an effect body triggers a second render pass on every mount.
+ */
+const resolveTheme = (): Theme | undefined => {
+  if (!canUseDOM) return undefined
+
+  const stored = window.localStorage.getItem(themeLocalStorageKey)
+  if (themeIsValid(stored)) return stored
+
+  return getImplicitPreference() ?? defaultTheme
+}
+
 export const ThemeProvider = ({ children }: { children: React.ReactNode }) => {
-  const [theme, setThemeState] = useState<Theme | undefined>(
-    canUseDOM ? (document.documentElement.getAttribute('data-theme') as Theme) : undefined,
-  )
+  const [theme, setThemeState] = useState<Theme | undefined>(resolveTheme)
 
   const setTheme = useCallback((themeToSet: Theme | null) => {
     if (themeToSet === null) {
@@ -33,23 +45,10 @@ export const ThemeProvider = ({ children }: { children: React.ReactNode }) => {
     }
   }, [])
 
+  // The effect now only synchronises the DOM with what the render already knows.
   useEffect(() => {
-    let themeToSet: Theme = defaultTheme
-    const preference = window.localStorage.getItem(themeLocalStorageKey)
-
-    if (themeIsValid(preference)) {
-      themeToSet = preference
-    } else {
-      const implicitPreference = getImplicitPreference()
-
-      if (implicitPreference) {
-        themeToSet = implicitPreference
-      }
-    }
-
-    document.documentElement.setAttribute('data-theme', themeToSet)
-    setThemeState(themeToSet)
-  }, [])
+    if (theme) document.documentElement.setAttribute('data-theme', theme)
+  }, [theme])
 
   return <ThemeContext value={{ setTheme, theme }}>{children}</ThemeContext>
 }

@@ -14,6 +14,7 @@ export const post1: (args: PostArgs) => RequiredDataFromCollectionSlug<'posts'> 
 }) => {
   return {
     slug: 'digital-horizons',
+    excerpt: 'Demo content from the Payload website template.',
     _status: 'published',
     authors: [author],
     content: {

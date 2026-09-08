@@ -67,6 +67,15 @@ export interface Config {
   };
   blocks: {};
   collections: {
+    herbs: Herb;
+    'herb-groups': HerbGroup;
+    'herb-claims': HerbClaim;
+    'claim-review-audit': ClaimReviewAudit;
+    activities: Activity;
+    downloads: Download;
+    indicators: Indicator;
+    partners: Partner;
+    'project-videos': ProjectVideo;
     pages: Page;
     posts: Post;
     media: Media;
@@ -84,11 +93,26 @@ export interface Config {
     'payload-migrations': PayloadMigration;
   };
   collectionsJoins: {
+    'herb-groups': {
+      herbs: 'herbs';
+    };
+    'herb-claims': {
+      auditLogs: 'claim-review-audit';
+    };
     'payload-folders': {
       documentsAndFolders: 'payload-folders' | 'media';
     };
   };
   collectionsSelect: {
+    herbs: HerbsSelect<false> | HerbsSelect<true>;
+    'herb-groups': HerbGroupsSelect<false> | HerbGroupsSelect<true>;
+    'herb-claims': HerbClaimsSelect<false> | HerbClaimsSelect<true>;
+    'claim-review-audit': ClaimReviewAuditSelect<false> | ClaimReviewAuditSelect<true>;
+    activities: ActivitiesSelect<false> | ActivitiesSelect<true>;
+    downloads: DownloadsSelect<false> | DownloadsSelect<true>;
+    indicators: IndicatorsSelect<false> | IndicatorsSelect<true>;
+    partners: PartnersSelect<false> | PartnersSelect<true>;
+    'project-videos': ProjectVideosSelect<false> | ProjectVideosSelect<true>;
     pages: PagesSelect<false> | PagesSelect<true>;
     posts: PostsSelect<false> | PostsSelect<true>;
     media: MediaSelect<false> | MediaSelect<true>;
@@ -112,10 +136,16 @@ export interface Config {
   globals: {
     header: Header;
     footer: Footer;
+    'site-settings': SiteSetting;
+    'project-facts': ProjectFact;
+    'satisfaction-summary': SatisfactionSummary;
   };
   globalsSelect: {
     header: HeaderSelect<false> | HeaderSelect<true>;
     footer: FooterSelect<false> | FooterSelect<true>;
+    'site-settings': SiteSettingsSelect<false> | SiteSettingsSelect<true>;
+    'project-facts': ProjectFactsSelect<false> | ProjectFactsSelect<true>;
+    'satisfaction-summary': SatisfactionSummarySelect<false> | SatisfactionSummarySelect<true>;
   };
   locale: null;
   widgets: {
@@ -153,114 +183,124 @@ export interface UserAuthOperations {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "pages".
+ * via the `definition` "herbs".
  */
-export interface Page {
+export interface Herb {
   id: number;
-  title: string;
-  hero: {
-    type: 'none' | 'highImpact' | 'mediumImpact' | 'lowImpact';
-    richText?: {
-      root: {
-        type: string;
-        children: {
-          type: any;
-          version: number;
-          [k: string]: unknown;
-        }[];
-        direction: ('ltr' | 'rtl') | null;
-        format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
-        indent: number;
-        version: number;
-      };
-      [k: string]: unknown;
-    } | null;
-    links?:
-      | {
-          link: {
-            type?: ('reference' | 'custom') | null;
-            newTab?: boolean | null;
-            reference?:
-              | ({
-                  relationTo: 'pages';
-                  value: number | Page;
-                } | null)
-              | ({
-                  relationTo: 'posts';
-                  value: number | Post;
-                } | null);
-            url?: string | null;
-            label: string;
-            /**
-             * Choose how the link should be rendered.
-             */
-            appearance?: ('default' | 'outline') | null;
-          };
-          id?: string | null;
-        }[]
-      | null;
-    media?: (number | null) | Media;
-  };
-  layout: (CallToActionBlock | ContentBlock | MediaBlock | ArchiveBlock | FormBlock)[];
-  meta?: {
-    title?: string | null;
-    /**
-     * Maximum upload file size: 12MB. Recommended file size for images is <500KB.
-     */
-    image?: (number | null) | Media;
-    description?: string | null;
-  };
-  publishedAt?: string | null;
+  nameTh: string;
   /**
-   * When enabled, the slug will auto-generate from the title field on save and autosave.
+   * Position in the printed guide; drives the ชท xx accession code.
    */
-  generateSlug?: boolean | null;
-  slug: string;
-  updatedAt: string;
-  createdAt: string;
-  _status?: ('draft' | 'published') | null;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "posts".
- */
-export interface Post {
-  id: number;
-  title: string;
-  heroImage?: (number | null) | Media;
-  content: {
-    root: {
-      type: string;
-      children: {
-        type: any;
-        version: number;
-        [k: string]: unknown;
-      }[];
-      direction: ('ltr' | 'rtl') | null;
-      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
-      indent: number;
-      version: number;
-    };
-    [k: string]: unknown;
-  };
-  relatedPosts?: (number | Post)[] | null;
-  categories?: (number | Category)[] | null;
-  meta?: {
-    title?: string | null;
-    /**
-     * Maximum upload file size: 12MB. Recommended file size for images is <500KB.
-     */
-    image?: (number | null) | Media;
-    description?: string | null;
-  };
-  publishedAt?: string | null;
-  authors?: (number | User)[] | null;
-  populatedAuthors?:
+  accessionNo: number;
+  scientificName: string;
+  family?: string | null;
+  familyTh?: string | null;
+  localNames?:
     | {
+        value: string;
         id?: string | null;
-        name?: string | null;
       }[]
     | null;
+  commonNames?:
+    | {
+        value: string;
+        id?: string | null;
+      }[]
+    | null;
+  tagline?: string | null;
+  ecology?:
+    | {
+        value: string;
+        id?: string | null;
+      }[]
+    | null;
+  botany?:
+    | {
+        value: string;
+        id?: string | null;
+      }[]
+    | null;
+  uses?:
+    | {
+        value: string;
+        id?: string | null;
+      }[]
+    | null;
+  partsUsed?: string | null;
+  properties?:
+    | {
+        value: string;
+        id?: string | null;
+      }[]
+    | null;
+  howToUse?:
+    | {
+        /**
+         * Sub-heading on the card (ชาสมุนไพร, ตำรับพื้นบ้าน). Leave empty for a single unlabelled method.
+         */
+        title?: string | null;
+        text: string;
+        id?: string | null;
+      }[]
+    | null;
+  cautions?: string | null;
+  localWisdom?: string | null;
+  phytochemicals?:
+    | {
+        value: string;
+        id?: string | null;
+      }[]
+    | null;
+  significance?: string | null;
+  media?: {
+    /**
+     * Cropped plant photograph from the guide card.
+     */
+    thumb?: (number | null) | Media;
+    /**
+     * The full infographic card as printed in the guide.
+     */
+    card?: (number | null) | Media;
+    alt?: string | null;
+  };
+  source: {
+    label: string;
+    kind: 'project-guide' | 'project-report' | 'community-wisdom' | 'reference';
+  };
+  /**
+   * Reading behind the สรรพคุณ. "External" entries are provisional stand-ins and are labelled as such on screen until a reviewer accepts a citation.
+   */
+  references?:
+    | {
+        label: string;
+        url?: string | null;
+        kind: 'guide' | 'external';
+        id?: string | null;
+      }[]
+    | null;
+  /**
+   * Editorial links to the five poster groups. Never derive these from name matching.
+   */
+  groupMemberships?:
+    | {
+        group: number | HerbGroup;
+        note?: string | null;
+        id?: string | null;
+      }[]
+    | null;
+  /**
+   * Primary key in the pre-migration database. Set by the importer.
+   */
+  legacyId?: string | null;
+  /**
+   * Editorial tracking only. Public visibility is controlled by Publish.
+   */
+  editorialStatus?: ('draft' | 'in_review' | 'published' | 'archived') | null;
+  /**
+   * Botanist or Thai-medicine practitioner who signed the record off.
+   */
+  reviewedBy?: string | null;
+  reviewedAt?: string | null;
   /**
    * When enabled, the slug will auto-generate from the title field on save and autosave.
    */
@@ -277,6 +317,22 @@ export interface Post {
 export interface Media {
   id: number;
   alt?: string | null;
+  /**
+   * Path on the pre-migration site. Set by the importer.
+   */
+  legacyPath?: string | null;
+  credit?: string | null;
+  license?: string | null;
+  consentStatus?: ('unknown' | 'granted' | 'restricted' | 'withdrawn') | null;
+  containsMinors?: boolean | null;
+  /**
+   * Required before media containing minors can be listed publicly.
+   */
+  consentEvidenceRef?: string | null;
+  /**
+   * Set this and the item drops out of every public listing immediately.
+   */
+  takedownRequestedAt?: string | null;
   caption?: {
     root: {
       type: string;
@@ -389,6 +445,393 @@ export interface FolderInterface {
   folderType?: 'media'[] | null;
   updatedAt: string;
   createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "herb-groups".
+ */
+export interface HerbGroup {
+  id: number;
+  titleTh: string;
+  titleEn: string;
+  /**
+   * กลุ่มที่ 1–5, as printed.
+   */
+  number: number;
+  intro?: string | null;
+  tables?:
+    | {
+        heading?: string | null;
+        rows?:
+          | {
+              name: string;
+              properties: string;
+              preparation: string;
+              id?: string | null;
+            }[]
+          | null;
+        id?: string | null;
+      }[]
+    | null;
+  panels?:
+    | {
+        title: string;
+        items?:
+          | {
+              value: string;
+              id?: string | null;
+            }[]
+          | null;
+        note?: string | null;
+        id?: string | null;
+      }[]
+    | null;
+  cautions?:
+    | {
+        value: string;
+        id?: string | null;
+      }[]
+    | null;
+  footer?: string | null;
+  /**
+   * The printed poster for this group.
+   */
+  poster?: (number | null) | Media;
+  /**
+   * Herbs linked to this group (edited from the herb record).
+   */
+  herbs?: {
+    docs?: (number | Herb)[];
+    hasNextPage?: boolean;
+    totalDocs?: number;
+  };
+  /**
+   * Primary key in the pre-migration database. Set by the importer.
+   */
+  legacyId?: string | null;
+  /**
+   * When enabled, the slug will auto-generate from the title field on save and autosave.
+   */
+  generateSlug?: boolean | null;
+  slug: string;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "herb-claims".
+ */
+export interface HerbClaim {
+  id: number;
+  herb: number | Herb;
+  section: 'property' | 'how_to_use' | 'caution';
+  title?: string | null;
+  text: string;
+  kind: 'community_wisdom' | 'reference' | 'research';
+  sourceRefs?:
+    | {
+        value: string;
+        id?: string | null;
+      }[]
+    | null;
+  /**
+   * Order within its section.
+   */
+  position?: number | null;
+  reviewStatus: 'pending' | 'reviewed' | 'rejected';
+  /**
+   * Recorded on the audit row for this change.
+   */
+  reviewNote?: string | null;
+  reviewedBy?: string | null;
+  reviewedAt?: string | null;
+  /**
+   * Primary key in the pre-migration database. Set by the importer.
+   */
+  legacyId?: string | null;
+  auditLogs?: {
+    docs?: (number | ClaimReviewAudit)[];
+    hasNextPage?: boolean;
+    totalDocs?: number;
+  };
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "claim-review-audit".
+ */
+export interface ClaimReviewAudit {
+  id: number;
+  claim: number | HerbClaim;
+  fromStatus?: ('pending' | 'reviewed' | 'rejected') | null;
+  toStatus: 'pending' | 'reviewed' | 'rejected';
+  changedBy: string;
+  reason?: string | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "activities".
+ */
+export interface Activity {
+  id: number;
+  title: string;
+  /**
+   * As printed, e.g. 12 มีนาคม 2569.
+   */
+  dateLabel: string;
+  place: string;
+  participants: number;
+  summary: string;
+  outcomes?:
+    | {
+        value: string;
+        id?: string | null;
+      }[]
+    | null;
+  /**
+   * Only media with recorded consent reaches the public gallery — see the consent fields on each item.
+   */
+  photos?: (number | Media)[] | null;
+  /**
+   * Lower numbers appear first.
+   */
+  order?: number | null;
+  /**
+   * Primary key in the pre-migration database. Set by the importer.
+   */
+  legacyId?: string | null;
+  updatedAt: string;
+  createdAt: string;
+  _status?: ('draft' | 'published') | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "downloads".
+ */
+export interface Download {
+  id: number;
+  title: string;
+  description: string;
+  type: 'guide' | 'report' | 'poster' | 'infographic' | 'research' | 'presentation' | 'form';
+  /**
+   * Leave empty while the file is being prepared — the page renders "กำลังจัดเตรียมไฟล์".
+   */
+  file?: (number | null) | Media;
+  /**
+   * Shown next to the link. Derived from the file when left empty.
+   */
+  sizeLabel?: string | null;
+  /**
+   * Lower numbers appear first.
+   */
+  order?: number | null;
+  /**
+   * Primary key in the pre-migration database. Set by the importer.
+   */
+  legacyId?: string | null;
+  updatedAt: string;
+  createdAt: string;
+  _status?: ('draft' | 'published') | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "indicators".
+ */
+export interface Indicator {
+  id: number;
+  label: string;
+  target: string;
+  result: string;
+  met?: boolean | null;
+  /**
+   * Lower numbers appear first.
+   */
+  order?: number | null;
+  /**
+   * Primary key in the pre-migration database. Set by the importer.
+   */
+  legacyId?: string | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "partners".
+ */
+export interface Partner {
+  id: number;
+  label: string;
+  role: string;
+  links?:
+    | {
+        kind: 'website' | 'map' | 'facebook';
+        href: string;
+        id?: string | null;
+      }[]
+    | null;
+  /**
+   * Lower numbers appear first.
+   */
+  order?: number | null;
+  /**
+   * Primary key in the pre-migration database. Set by the importer.
+   */
+  legacyId?: string | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "project-videos".
+ */
+export interface ProjectVideo {
+  id: number;
+  title: string;
+  description: string;
+  /**
+   * The 11-character video ID, not the full URL.
+   */
+  youtubeId: string;
+  channel: string;
+  /**
+   * Lower numbers appear first.
+   */
+  order?: number | null;
+  /**
+   * Primary key in the pre-migration database. Set by the importer.
+   */
+  legacyId?: string | null;
+  updatedAt: string;
+  createdAt: string;
+  _status?: ('draft' | 'published') | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "pages".
+ */
+export interface Page {
+  id: number;
+  title: string;
+  hero: {
+    type: 'none' | 'highImpact' | 'mediumImpact' | 'lowImpact';
+    richText?: {
+      root: {
+        type: string;
+        children: {
+          type: any;
+          version: number;
+          [k: string]: unknown;
+        }[];
+        direction: ('ltr' | 'rtl') | null;
+        format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+        indent: number;
+        version: number;
+      };
+      [k: string]: unknown;
+    } | null;
+    links?:
+      | {
+          link: {
+            type?: ('reference' | 'custom') | null;
+            newTab?: boolean | null;
+            reference?:
+              | ({
+                  relationTo: 'pages';
+                  value: number | Page;
+                } | null)
+              | ({
+                  relationTo: 'posts';
+                  value: number | Post;
+                } | null);
+            url?: string | null;
+            label: string;
+            /**
+             * Choose how the link should be rendered.
+             */
+            appearance?: ('default' | 'outline') | null;
+          };
+          id?: string | null;
+        }[]
+      | null;
+    media?: (number | null) | Media;
+  };
+  layout: (CallToActionBlock | ContentBlock | MediaBlock | ArchiveBlock | FormBlock)[];
+  meta?: {
+    title?: string | null;
+    /**
+     * Maximum upload file size: 12MB. Recommended file size for images is <500KB.
+     */
+    image?: (number | null) | Media;
+    description?: string | null;
+  };
+  publishedAt?: string | null;
+  /**
+   * When enabled, the slug will auto-generate from the title field on save and autosave.
+   */
+  generateSlug?: boolean | null;
+  slug: string;
+  updatedAt: string;
+  createdAt: string;
+  _status?: ('draft' | 'published') | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "posts".
+ */
+export interface Post {
+  id: number;
+  title: string;
+  excerpt: string;
+  heroImage?: (number | null) | Media;
+  content: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  };
+  relatedPosts?: (number | Post)[] | null;
+  /**
+   * news / knowledge / announcement — the old ArticleCategory enum.
+   */
+  categories?: (number | Category)[] | null;
+  authorLabel?: string | null;
+  readingMinutes?: number | null;
+  meta?: {
+    title?: string | null;
+    /**
+     * Maximum upload file size: 12MB. Recommended file size for images is <500KB.
+     */
+    image?: (number | null) | Media;
+    description?: string | null;
+  };
+  publishedAt?: string | null;
+  authors?: (number | User)[] | null;
+  populatedAuthors?:
+    | {
+        id?: string | null;
+        name?: string | null;
+      }[]
+    | null;
+  /**
+   * When enabled, the slug will auto-generate from the title field on save and autosave.
+   */
+  generateSlug?: boolean | null;
+  slug: string;
+  updatedAt: string;
+  createdAt: string;
+  _status?: ('draft' | 'published') | null;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -964,6 +1407,42 @@ export interface PayloadLockedDocument {
   id: number;
   document?:
     | ({
+        relationTo: 'herbs';
+        value: number | Herb;
+      } | null)
+    | ({
+        relationTo: 'herb-groups';
+        value: number | HerbGroup;
+      } | null)
+    | ({
+        relationTo: 'herb-claims';
+        value: number | HerbClaim;
+      } | null)
+    | ({
+        relationTo: 'claim-review-audit';
+        value: number | ClaimReviewAudit;
+      } | null)
+    | ({
+        relationTo: 'activities';
+        value: number | Activity;
+      } | null)
+    | ({
+        relationTo: 'downloads';
+        value: number | Download;
+      } | null)
+    | ({
+        relationTo: 'indicators';
+        value: number | Indicator;
+      } | null)
+    | ({
+        relationTo: 'partners';
+        value: number | Partner;
+      } | null)
+    | ({
+        relationTo: 'project-videos';
+        value: number | ProjectVideo;
+      } | null)
+    | ({
         relationTo: 'pages';
         value: number | Page;
       } | null)
@@ -1044,6 +1523,285 @@ export interface PayloadMigration {
   batch?: number | null;
   updatedAt: string;
   createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "herbs_select".
+ */
+export interface HerbsSelect<T extends boolean = true> {
+  nameTh?: T;
+  accessionNo?: T;
+  scientificName?: T;
+  family?: T;
+  familyTh?: T;
+  localNames?:
+    | T
+    | {
+        value?: T;
+        id?: T;
+      };
+  commonNames?:
+    | T
+    | {
+        value?: T;
+        id?: T;
+      };
+  tagline?: T;
+  ecology?:
+    | T
+    | {
+        value?: T;
+        id?: T;
+      };
+  botany?:
+    | T
+    | {
+        value?: T;
+        id?: T;
+      };
+  uses?:
+    | T
+    | {
+        value?: T;
+        id?: T;
+      };
+  partsUsed?: T;
+  properties?:
+    | T
+    | {
+        value?: T;
+        id?: T;
+      };
+  howToUse?:
+    | T
+    | {
+        title?: T;
+        text?: T;
+        id?: T;
+      };
+  cautions?: T;
+  localWisdom?: T;
+  phytochemicals?:
+    | T
+    | {
+        value?: T;
+        id?: T;
+      };
+  significance?: T;
+  media?:
+    | T
+    | {
+        thumb?: T;
+        card?: T;
+        alt?: T;
+      };
+  source?:
+    | T
+    | {
+        label?: T;
+        kind?: T;
+      };
+  references?:
+    | T
+    | {
+        label?: T;
+        url?: T;
+        kind?: T;
+        id?: T;
+      };
+  groupMemberships?:
+    | T
+    | {
+        group?: T;
+        note?: T;
+        id?: T;
+      };
+  legacyId?: T;
+  editorialStatus?: T;
+  reviewedBy?: T;
+  reviewedAt?: T;
+  generateSlug?: T;
+  slug?: T;
+  updatedAt?: T;
+  createdAt?: T;
+  _status?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "herb-groups_select".
+ */
+export interface HerbGroupsSelect<T extends boolean = true> {
+  titleTh?: T;
+  titleEn?: T;
+  number?: T;
+  intro?: T;
+  tables?:
+    | T
+    | {
+        heading?: T;
+        rows?:
+          | T
+          | {
+              name?: T;
+              properties?: T;
+              preparation?: T;
+              id?: T;
+            };
+        id?: T;
+      };
+  panels?:
+    | T
+    | {
+        title?: T;
+        items?:
+          | T
+          | {
+              value?: T;
+              id?: T;
+            };
+        note?: T;
+        id?: T;
+      };
+  cautions?:
+    | T
+    | {
+        value?: T;
+        id?: T;
+      };
+  footer?: T;
+  poster?: T;
+  herbs?: T;
+  legacyId?: T;
+  generateSlug?: T;
+  slug?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "herb-claims_select".
+ */
+export interface HerbClaimsSelect<T extends boolean = true> {
+  herb?: T;
+  section?: T;
+  title?: T;
+  text?: T;
+  kind?: T;
+  sourceRefs?:
+    | T
+    | {
+        value?: T;
+        id?: T;
+      };
+  position?: T;
+  reviewStatus?: T;
+  reviewNote?: T;
+  reviewedBy?: T;
+  reviewedAt?: T;
+  legacyId?: T;
+  auditLogs?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "claim-review-audit_select".
+ */
+export interface ClaimReviewAuditSelect<T extends boolean = true> {
+  claim?: T;
+  fromStatus?: T;
+  toStatus?: T;
+  changedBy?: T;
+  reason?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "activities_select".
+ */
+export interface ActivitiesSelect<T extends boolean = true> {
+  title?: T;
+  dateLabel?: T;
+  place?: T;
+  participants?: T;
+  summary?: T;
+  outcomes?:
+    | T
+    | {
+        value?: T;
+        id?: T;
+      };
+  photos?: T;
+  order?: T;
+  legacyId?: T;
+  updatedAt?: T;
+  createdAt?: T;
+  _status?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "downloads_select".
+ */
+export interface DownloadsSelect<T extends boolean = true> {
+  title?: T;
+  description?: T;
+  type?: T;
+  file?: T;
+  sizeLabel?: T;
+  order?: T;
+  legacyId?: T;
+  updatedAt?: T;
+  createdAt?: T;
+  _status?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "indicators_select".
+ */
+export interface IndicatorsSelect<T extends boolean = true> {
+  label?: T;
+  target?: T;
+  result?: T;
+  met?: T;
+  order?: T;
+  legacyId?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "partners_select".
+ */
+export interface PartnersSelect<T extends boolean = true> {
+  label?: T;
+  role?: T;
+  links?:
+    | T
+    | {
+        kind?: T;
+        href?: T;
+        id?: T;
+      };
+  order?: T;
+  legacyId?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "project-videos_select".
+ */
+export interface ProjectVideosSelect<T extends boolean = true> {
+  title?: T;
+  description?: T;
+  youtubeId?: T;
+  channel?: T;
+  order?: T;
+  legacyId?: T;
+  updatedAt?: T;
+  createdAt?: T;
+  _status?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -1186,10 +1944,13 @@ export interface FormBlockSelect<T extends boolean = true> {
  */
 export interface PostsSelect<T extends boolean = true> {
   title?: T;
+  excerpt?: T;
   heroImage?: T;
   content?: T;
   relatedPosts?: T;
   categories?: T;
+  authorLabel?: T;
+  readingMinutes?: T;
   meta?:
     | T
     | {
@@ -1217,6 +1978,13 @@ export interface PostsSelect<T extends boolean = true> {
  */
 export interface MediaSelect<T extends boolean = true> {
   alt?: T;
+  legacyPath?: T;
+  credit?: T;
+  license?: T;
+  consentStatus?: T;
+  containsMinors?: T;
+  consentEvidenceRef?: T;
+  takedownRequestedAt?: T;
   caption?: T;
   prefix?: T;
   folder?: T;
@@ -1684,6 +2452,101 @@ export interface Footer {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "site-settings".
+ */
+export interface SiteSetting {
+  id: number;
+  contactEmail?: string | null;
+  contactPhone?: string | null;
+  ownerUrl?: string | null;
+  ownerMapUrl?: string | null;
+  funderUrl?: string | null;
+  developerLabel?: string | null;
+  developerHref?: string | null;
+  updatedAt?: string | null;
+  createdAt?: string | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "project-facts".
+ */
+export interface ProjectFact {
+  id: number;
+  nameTh: string;
+  shortName: string;
+  nameEn: string;
+  tagline: string;
+  owner: string;
+  funder: string;
+  period: string;
+  fiscalYear: string;
+  strategy: string;
+  budgetTHB: number;
+  budgetCode: string;
+  leads?:
+    | {
+        value: string;
+        id?: string | null;
+      }[]
+    | null;
+  reportDate: string;
+  objectives?:
+    | {
+        value: string;
+        id?: string | null;
+      }[]
+    | null;
+  recommendations?:
+    | {
+        value: string;
+        id?: string | null;
+      }[]
+    | null;
+  bibliography?:
+    | {
+        value: string;
+        id?: string | null;
+      }[]
+    | null;
+  /**
+   * Shown wherever health information appears. Do not remove without a clinical reviewer.
+   */
+  safetyNotice: string;
+  updatedAt?: string | null;
+  createdAt?: string | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "satisfaction-summary".
+ */
+export interface SatisfactionSummary {
+  id: number;
+  respondents: number;
+  overallMean: number;
+  overallPercent: number;
+  /**
+   * As printed in the report.
+   */
+  collectedAt: string;
+  items?:
+    | {
+        label: string;
+        mean: number;
+        id?: string | null;
+      }[]
+    | null;
+  profile?:
+    | {
+        label: string;
+        percent: number;
+        id?: string | null;
+      }[]
+    | null;
+  updatedAt?: string | null;
+  createdAt?: string | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "header_select".
  */
 export interface HeaderSelect<T extends boolean = true> {
@@ -1730,6 +2593,95 @@ export interface FooterSelect<T extends boolean = true> {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "site-settings_select".
+ */
+export interface SiteSettingsSelect<T extends boolean = true> {
+  contactEmail?: T;
+  contactPhone?: T;
+  ownerUrl?: T;
+  ownerMapUrl?: T;
+  funderUrl?: T;
+  developerLabel?: T;
+  developerHref?: T;
+  updatedAt?: T;
+  createdAt?: T;
+  globalType?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "project-facts_select".
+ */
+export interface ProjectFactsSelect<T extends boolean = true> {
+  nameTh?: T;
+  shortName?: T;
+  nameEn?: T;
+  tagline?: T;
+  owner?: T;
+  funder?: T;
+  period?: T;
+  fiscalYear?: T;
+  strategy?: T;
+  budgetTHB?: T;
+  budgetCode?: T;
+  leads?:
+    | T
+    | {
+        value?: T;
+        id?: T;
+      };
+  reportDate?: T;
+  objectives?:
+    | T
+    | {
+        value?: T;
+        id?: T;
+      };
+  recommendations?:
+    | T
+    | {
+        value?: T;
+        id?: T;
+      };
+  bibliography?:
+    | T
+    | {
+        value?: T;
+        id?: T;
+      };
+  safetyNotice?: T;
+  updatedAt?: T;
+  createdAt?: T;
+  globalType?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "satisfaction-summary_select".
+ */
+export interface SatisfactionSummarySelect<T extends boolean = true> {
+  respondents?: T;
+  overallMean?: T;
+  overallPercent?: T;
+  collectedAt?: T;
+  items?:
+    | T
+    | {
+        label?: T;
+        mean?: T;
+        id?: T;
+      };
+  profile?:
+    | T
+    | {
+        label?: T;
+        percent?: T;
+        id?: T;
+      };
+  updatedAt?: T;
+  createdAt?: T;
+  globalType?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "collections_widget".
  */
 export interface CollectionsWidget {
@@ -1747,6 +2699,10 @@ export interface TaskSchedulePublish {
     type?: ('publish' | 'unpublish') | null;
     locale?: string | null;
     doc?:
+      | ({
+          relationTo: 'herbs';
+          value: number | Herb;
+        } | null)
       | ({
           relationTo: 'pages';
           value: number | Page;

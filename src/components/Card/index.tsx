@@ -19,6 +19,9 @@ export const Card: React.FC<{
   title?: string
 }> = (props) => {
   const { card, link } = useClickableCard({})
+  // Read the refs out before JSX: the lint rule cannot see through the object.
+  const { ref: cardRef } = card
+  const { ref: linkRef } = link
   const { className, doc, relationTo, showCategories, title: titleFromProps } = props
 
   const { slug, categories, meta, title } = doc || {}
@@ -27,7 +30,8 @@ export const Card: React.FC<{
   const hasCategories = categories && Array.isArray(categories) && categories.length > 0
   const titleToUse = titleFromProps || title
   const sanitizedDescription = description?.replace(/\s/g, ' ') // replace non-breaking space with white space
-  const href = `/${relationTo}/${slug}`
+  // Articles live at /news on this site, not the template's /posts.
+  const href = relationTo === 'posts' ? `/news/${slug}` : `/${slug}`
 
   return (
     <article
@@ -35,7 +39,7 @@ export const Card: React.FC<{
         'border border-border rounded-lg overflow-hidden bg-card hover:cursor-pointer',
         className,
       )}
-      ref={card.ref}
+      ref={cardRef}
     >
       <div className="relative w-full ">
         {!metaImage && <div className="">No image</div>}
@@ -67,7 +71,7 @@ export const Card: React.FC<{
         {titleToUse && (
           <div className="prose">
             <h3>
-              <Link className="not-prose" href={href} ref={link.ref}>
+              <Link className="not-prose" href={href} ref={linkRef}>
                 {titleToUse}
               </Link>
             </h3>

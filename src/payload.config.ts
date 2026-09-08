@@ -4,13 +4,25 @@ import path from 'path'
 import { buildConfig, PayloadRequest } from 'payload'
 import { fileURLToPath } from 'url'
 
+import { Activities } from './collections/Activities'
 import { Categories } from './collections/Categories'
+import { ClaimReviewAudit } from './collections/ClaimReviewAudit'
+import { Downloads } from './collections/Downloads'
+import { HerbClaims } from './collections/HerbClaims'
+import { HerbGroups } from './collections/HerbGroups'
+import { Herbs } from './collections/Herbs'
+import { Indicators } from './collections/Indicators'
 import { Media } from './collections/Media'
 import { Pages } from './collections/Pages'
+import { Partners } from './collections/Partners'
 import { Posts } from './collections/Posts'
+import { ProjectVideos } from './collections/ProjectVideos'
 import { Users } from './collections/Users'
 import { Footer } from './Footer/config'
 import { Header } from './Header/config'
+import { ProjectFacts } from './globals/ProjectFacts/config'
+import { SatisfactionSummary } from './globals/SatisfactionSummary/config'
+import { SiteSettings } from './globals/SiteSettings/config'
 import { plugins } from './plugins'
 import { defaultLexical } from '@/fields/defaultLexical'
 import { getServerSideURL } from './utilities/getURL'
@@ -62,9 +74,27 @@ export default buildConfig({
       connectionString: process.env.POSTGRES_URL || process.env.DATABASE_URL || '',
     },
   }),
-  collections: [Pages, Posts, Media, Categories, Users],
+  collections: [
+    // Herbarium — the register itself and its review workflow
+    Herbs,
+    HerbGroups,
+    HerbClaims,
+    ClaimReviewAudit,
+    // Project — everything the report and the activity pages need
+    Activities,
+    Downloads,
+    Indicators,
+    Partners,
+    ProjectVideos,
+    // Template collections: Posts carries news / knowledge / announcements
+    Pages,
+    Posts,
+    Media,
+    Categories,
+    Users,
+  ],
   cors: [getServerSideURL()].filter(Boolean),
-  globals: [Header, Footer],
+  globals: [Header, Footer, SiteSettings, ProjectFacts, SatisfactionSummary],
   plugins,
   secret: process.env.PAYLOAD_SECRET,
   sharp,

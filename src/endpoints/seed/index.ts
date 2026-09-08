@@ -20,7 +20,9 @@ const collections: CollectionSlug[] = [
   'search',
 ]
 
-const globals: GlobalSlug[] = ['header', 'footer']
+// Only the two nav globals are reset by the template seed; the project globals
+// (site-settings, project-facts, satisfaction-summary) are content, not fixtures.
+const globals = ['header', 'footer'] as const satisfies readonly GlobalSlug[]
 
 const categories = ['Technology', 'News', 'Finance', 'Design', 'Software', 'Engineering']
 

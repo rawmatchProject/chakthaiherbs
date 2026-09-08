@@ -1,29 +1,572 @@
-@import 'tailwindcss';
-@import 'tw-animate-css';
+/* ==========================================================================
+   chakthaiherbs — frontend stylesheet
 
-@config '../../../tailwind.config.mjs';
+   The design system below is the Chak Thai herbarium's own, ported whole from
+   the pre-migration site: palette sampled from the project's photographs, Kanit
+   for headings, Google Sans for Thai text, four text steps, and a reader-set
+   text scale. It is the base.
+
+   Appended at the end: the pieces the Payload website template's own
+   components need on top of it — breakpoints, the container utility, the
+   typography plugin, the extra state colours, and the class names Payload
+   composes at runtime (which Tailwind cannot see in source).
+   ========================================================================== */
+
+@import "tailwindcss";
+@import "tw-animate-css";
+@import "shadcn/tailwind.css";
 
 @custom-variant dark (&:is([data-theme='dark'] *));
-@custom-variant sm (@media (width >= theme(--breakpoint-sm)));
-@custom-variant md (@media (width >= theme(--breakpoint-md)));
-@custom-variant lg (@media (width >= theme(--breakpoint-lg)));
-@custom-variant xl (@media (width >= theme(--breakpoint-xl)));
-@custom-variant 2xl (@media (width >= theme(--breakpoint-2xl)));
+
+/* ==========================================================================
+   ชากไทย — ทะเบียนสมุนไพรชุมชน (community herbarium)
+
+   Palette: all green and earth, sampled from the project's own photographs —
+   wet canopy, new growth, laterite mud, gravel path, dry leaf litter, and
+   turmeric as the single warm accent. No blue anywhere.
+
+   Type: Kanit for headings, Google Sans for text. Kanit is condensed and
+   angular, so headings carry weight and long Thai titles fit on fewer lines;
+   Google Sans sets lighter than Sarabun in Thai, so body copy runs at 500.
+   Monospace is reserved for Latin data (scientific names, result figures),
+   never for Thai — Thai in a tracked mono reads as a different, worse face.
+
+   Sized for comfortable reading at 18px with 1.9 line-height and nothing below
+   15px, and readers who want more can raise everything with the text-size
+   control in the header. Four text steps and four heading steps — every page
+   uses them, with no one-off sizes.
+   ========================================================================== */
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: var(--font-sans);
+  --font-heading: var(--font-heading);
+  --font-mono: var(--font-mono);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-destructive: var(--destructive);
+
+  --color-canopy: var(--canopy);
+  --color-canopy-deep: var(--canopy-deep);
+  --color-moss: var(--moss);
+  --color-marker: var(--marker);
+  --color-marker-bright: var(--marker-bright);
+  --color-turmeric: var(--turmeric);
+  --color-laterite: var(--laterite);
+  --color-gravel: var(--gravel);
+  --color-litter: var(--litter);
+  --color-paper: var(--paper);
+
+  --radius-sm: calc(var(--radius) * 0.6);
+  --radius-md: calc(var(--radius) * 0.8);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) * 1.4);
+}
+
+:root {
+  /* --- colour, sampled from the field photographs ------------------------ */
+  --ink: #17200f;          /* dark olive-black, body text                    */
+  --canopy: #1f3a1c;       /* wet canopy after rain — primary surfaces       */
+  --canopy-deep: #101d0d;  /* shadow under the canopy                        */
+  --moss: #5f7a3e;         /* new growth — bullets, quiet marks              */
+  --marker: #2c6137;       /* the garden marker green — links and structure  */
+  --marker-bright: #7fb069;/* the same green in sunlight — for dark grounds  */
+  --turmeric: #8f5210;     /* ขมิ้นชัน — the single warm accent (5.1:1 on page) */
+  --laterite: #8a5a3c;     /* the mud of the garden path                     */
+  --gravel: #b8b2a0;       /* the gravel walkway — rules and borders         */
+  --litter: #eee8d9;       /* dry leaf litter — the page                     */
+  --paper: #fbf8f1;        /* the printed guide                              */
+
+  /* --- shadcn semantic tokens -------------------------------------------- */
+  --background: var(--litter);
+  --foreground: var(--ink);
+  --card: var(--paper);
+  --card-foreground: var(--ink);
+  --popover: var(--paper);
+  --popover-foreground: var(--ink);
+  --primary: var(--canopy);
+  --primary-foreground: #f4f1e6;
+  --secondary: #e2dac6;
+  --secondary-foreground: var(--ink);
+  --muted: #e5dfcd;
+  --muted-foreground: #4f5540;
+  --accent: #dfe0c6;
+  --accent-foreground: var(--ink);
+  --border: #d3ccb6;
+  --input: #c6bfa8;
+  --ring: var(--marker);
+  --destructive: #9c3210;
+  --radius: 0.375rem;
+
+  /* --- type -------------------------------------------------------------- */
+  --font-sans: var(--font-thai), "Tahoma", sans-serif;
+  /* Kanit — condensed, angular, and heavy enough that no heading reads thin.
+     See the note in layout.tsx. Only 500/600/700 are loaded. */
+  --font-heading: var(--font-display), "Tahoma", sans-serif;
+  --weight-display: 600;
+  /* Google Sans is lighter than Sarabun in Thai; 500 restores the page colour. */
+  --weight-body: 500;
+  --font-mono: var(--font-plex-mono), ui-monospace, monospace;
+
+  /* Four text steps. Nothing smaller than --text-meta is used anywhere. */
+  --text-meta: 0.9375rem;  /* 15px — dates, captions, counts. The floor.     */
+  --text-sm: 1rem;         /* 16px — secondary prose, card body              */
+  --text-base: 1.125rem;   /* 18px — body text                               */
+  --text-lead: 1.25rem;    /* 20px — page intros                             */
+
+  /* Thai needs generous leading: tone marks stack two levels above the line
+     and sara u/uu hang below it. Older eyes need more again. */
+  --lh-thai-body: 1.9;
+  --lh-thai-display: 1.34;
+}
 
 @layer base {
-  h1,
-  h2,
-  h3,
-  h4,
-  h5,
-  h6 {
-    font-weight: unset;
-    font-size: unset;
+  * {
+    @apply border-border outline-ring/50;
+  }
+
+  /* The reader's own text-size setting. Every size on the site is in rem, so
+     moving the root moves the whole page together. Set by TextSizeControl and
+     restored before first paint by the inline script in the layout. */
+  html {
+    font-size: calc(100% * var(--text-scale, 1));
+  }
+
+  body {
+    background-color: var(--background);
+    color: var(--foreground);
+    font-size: var(--text-base);
+    font-weight: var(--weight-body);
+    line-height: var(--lh-thai-body);
+    /* No -webkit-font-smoothing: antialiased here. It thins Thai strokes
+       noticeably on macOS, which is what made every heading read light. */
+    text-rendering: optimizeLegibility;
+  }
+
+  h1, h2, h3, h4 {
+    font-family: var(--font-heading);
+    font-weight: var(--weight-display);
+    line-height: var(--lh-thai-display);
+    /* no negative tracking: Kanit is condensed already and closes up fast */
+  }
+
+  a {
+    @apply outline-none focus-visible:rounded-xs focus-visible:ring-3 focus-visible:ring-ring/70;
+  }
+
+  ::selection {
+    background: var(--marker);
+    color: #fff;
+  }
+
+  :where(button, [role="button"], a):focus-visible {
+    outline: 3px solid var(--marker);
+    outline-offset: 3px;
   }
 }
 
+/* ==========================================================================
+   Scrollbar
+
+   A moss thumb running in a leaf-litter channel — the same palette as the
+   rest of the page.
+
+   Two mechanisms, and they do not stack: where `scrollbar-color` is supported
+   (Chrome 121+, Firefox, Safari 18.2+) the engine ignores the
+   ::-webkit-scrollbar block entirely, so the bar keeps the platform's own
+   width and only takes the colour. The webkit block below is the fallback for
+   older engines. Deliberately not narrowed anywhere: these readers use the
+   scrollbar as a control, and a hairline is not a pointer target.
+   ========================================================================== */
+
+html {
+  scrollbar-color: var(--moss) var(--litter); /* thumb, then track */
+}
+
+/* Fallback only — see above. */
+::-webkit-scrollbar {
+  width: 14px;
+  height: 14px;
+}
+::-webkit-scrollbar-track {
+  background: var(--litter);
+}
+::-webkit-scrollbar-thumb {
+  background: var(--moss);
+  border-radius: 999px;
+  /* the border is the track colour showing through, which insets the thumb
+     without shrinking the pointer target */
+  border: 3px solid var(--litter);
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--marker);
+}
+::-webkit-scrollbar-corner {
+  background: var(--litter);
+}
+
+/* Panels that scroll sideways on a paper ground — the herb tables and the
+   activity strips — need the channel to match the panel, not the page. */
+.scroll-paper {
+  scrollbar-color: var(--gravel) var(--paper);
+}
+.scroll-paper::-webkit-scrollbar-track,
+.scroll-paper::-webkit-scrollbar-corner {
+  background: var(--paper);
+}
+.scroll-paper::-webkit-scrollbar-thumb {
+  background: var(--gravel);
+  border-color: var(--paper);
+}
+.scroll-paper::-webkit-scrollbar-thumb:hover {
+  background: var(--moss);
+}
+
+/* ==========================================================================
+   Layout helpers
+   ========================================================================== */
+
+.container-site {
+  @apply mx-auto w-full max-w-[84rem] px-5 sm:px-8 lg:px-12;
+}
+
+.display-font {
+  font-family: var(--font-heading);
+  font-weight: var(--weight-display);
+  line-height: var(--lh-thai-display);
+}
+
+/* --- the type scale ------------------------------------------------------ */
+
+.type-hero {
+  font-family: var(--font-heading);
+  font-weight: var(--weight-display);
+  font-size: clamp(2.375rem, 1.3rem + 4.6vw, 4.25rem);
+  line-height: 1.3;
+}
+.type-h2 {
+  font-family: var(--font-heading);
+  font-weight: var(--weight-display);
+  font-size: clamp(1.75rem, 1.1rem + 2.1vw, 2.75rem);
+  line-height: 1.36;
+}
+.type-h3 {
+  font-family: var(--font-heading);
+  font-weight: var(--weight-display);
+  font-size: clamp(1.4375rem, 1.2rem + 0.9vw, 1.875rem);
+  line-height: 1.42;
+}
+.type-h4 {
+  font-family: var(--font-heading);
+  font-weight: var(--weight-display);
+  font-size: clamp(1.25rem, 1.12rem + 0.5vw, 1.4375rem);
+  line-height: 1.46;
+}
+.type-lead {
+  font-size: var(--text-lead);
+  line-height: 1.82;
+}
+/* Secondary prose — card bodies, captions with sentences. */
+.type-sm {
+  font-size: var(--text-sm);
+  line-height: 1.85;
+}
+/* Dates, counts, short captions. 16px is the floor. */
+.type-meta {
+  font-size: var(--text-meta);
+  line-height: 1.7;
+}
+/* Section eyebrows and field labels. Set in the text face — Thai in a tracked
+   monospace reads as a different, worse typeface. */
+.label {
+  font-size: var(--text-meta);
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  line-height: 1.6;
+}
+
+/* Field labels set in the text face. `.label-th` was used in four places and
+   never existed — those lines silently rendered as plain body text. */
+.label-th {
+  font-size: var(--text-meta);
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  line-height: 1.6;
+}
+
+.skip-link {
+  @apply sr-only fixed top-4 left-4 z-100 rounded-xs bg-paper px-4 py-2 font-medium text-foreground shadow-lg focus:not-sr-only;
+}
+
+/* ==========================================================================
+   Signature — the garden marker plate
+
+   Every one of the 24 herbs in this project has a signpost staked next to it
+   in the community garden. That plate is reused here for anything carrying a
+   real identifier: accession codes, group numbers, activity numbers.
+   ========================================================================== */
+
+.plate {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: var(--marker);
+  color: #fff;
+  font-size: var(--text-meta);
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  padding: 0.4rem 0.75rem 0.42rem;
+  border-radius: 2px;
+  box-shadow: inset 0 0 0 1px rgb(255 255 255 / 0.4);
+}
+.plate-lg {
+  font-size: var(--text-sm);
+  padding: 0.5rem 1rem 0.55rem;
+}
+/* The staked version: a plate on a post, as it stands in the garden. */
+.plate-staked {
+  position: relative;
+}
+.plate-staked::after {
+  content: "";
+  position: absolute;
+  top: 100%;
+  left: 1.15rem;
+  width: 3px;
+  height: 0.9rem;
+  background: var(--marker);
+  opacity: 0.7;
+}
+
+/* A hairline rule that reads as the gravel edging of the garden path. */
+.rule-gravel {
+  height: 1px;
+  background: repeating-linear-gradient(
+    90deg,
+    var(--gravel) 0 4px,
+    transparent 4px 7px
+  );
+}
+
+/* Specimen-sheet frame: a thin keyline and a caption ledge, like a mounted
+   herbarium sheet. */
+.sheet {
+  background: var(--paper);
+  border: 1px solid var(--border);
+  box-shadow: 0 1px 0 0 rgb(23 32 15 / 0.05), 0 12px 28px -22px rgb(23 32 15 / 0.5);
+}
+
+/* ==========================================================================
+   Motion
+
+   Two mechanisms, both switched off entirely by the reduced-motion block at
+   the end of this file:
+
+   • `.rise` is a server-rendered entrance for above-the-fold content. It needs
+     no JavaScript, so the hero settles during the first paint rather than
+     after hydration. Stagger it with --rise-delay.
+   • <Reveal> handles everything below the fold, because a scroll trigger does
+     need JavaScript. It reveals whole sections, not individual elements —
+     a page where every card pops in separately reads as decoration.
+   ========================================================================== */
+
+.rise {
+  animation: rise 0.62s cubic-bezier(0.22, 1, 0.36, 1) backwards;
+  animation-delay: var(--rise-delay, 0ms);
+}
+@keyframes rise {
+  from {
+    opacity: 0;
+    transform: translateY(0.75rem);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* Scroll reveals. The hidden state is gated behind `.js`, which the layout's
+   inline script sets before first paint — so if scripting fails, the markup is
+   simply visible rather than a page of empty sections. */
+.js .reveal {
+  opacity: 0;
+  transform: translateY(1rem);
+}
+.js .reveal.is-visible {
+  opacity: 1;
+  transform: none;
+  transition:
+    opacity 0.62s cubic-bezier(0.22, 1, 0.36, 1),
+    transform 0.62s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+/* The result bars keep their true width inline and grow from the left. */
+.js .reveal-bars [style*="width"] {
+  transform: scaleX(0);
+  transform-origin: left;
+}
+.js .reveal-bars.is-visible [style*="width"] {
+  transform: none;
+  transition: transform 0.75s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+/* The hero photograph settles a beat behind the text on it. */
+.rise-scrim {
+  animation: scrim 1.4s cubic-bezier(0.22, 1, 0.36, 1) backwards;
+}
+@keyframes scrim {
+  from {
+    opacity: 0;
+    transform: scale(1.04);
+  }
+  to {
+    opacity: 0.45;
+    transform: none;
+  }
+}
+
+.marquee-track {
+  animation: marquee 90s linear infinite;
+}
+@keyframes marquee {
+  from { transform: translateX(0); }
+  to   { transform: translateX(-50%); }
+}
+.marquee-mask {
+  mask-image: linear-gradient(90deg, transparent, #000 6rem, #000 calc(100% - 6rem), transparent);
+}
+
+/* ==========================================================================
+   Hover
+
+   The site had none: every card was inert until it navigated. These are the
+   smallest gestures that say "this responds" — a lift, a slow photographic
+   zoom, an arrow that leans, and the leaf watermark turning as if caught by
+   the movement. All of them are removed under prefers-reduced-motion below.
+   ========================================================================== */
+
+.lift {
+  transition:
+    transform 0.32s cubic-bezier(0.22, 1, 0.36, 1),
+    box-shadow 0.32s cubic-bezier(0.22, 1, 0.36, 1),
+    border-color 0.32s ease;
+}
+/* focus-within, not only hover: a keyboard reader gets the same feedback */
+.lift:hover,
+.lift:focus-within {
+  transform: translateY(-4px);
+  border-color: color-mix(in oklab, var(--marker) 42%, var(--border));
+  box-shadow:
+    0 1px 0 0 rgb(23 32 15 / 0.06),
+    0 26px 44px -26px rgb(23 32 15 / 0.55);
+}
+
+.zoom-media {
+  transition: transform 0.85s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.group:hover .zoom-media,
+.group:focus-within .zoom-media {
+  transform: scale(1.045);
+}
+
+.arrow-slide {
+  display: inline-block;
+  transition: transform 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.group:hover .arrow-slide,
+.group:focus-within .arrow-slide,
+a:hover .arrow-slide,
+a:focus-visible .arrow-slide {
+  transform: translateX(0.3rem);
+}
+
+/* An underline that draws itself from the left, rather than blinking on. */
+.link-draw {
+  background-image: linear-gradient(var(--marker), var(--marker));
+  background-repeat: no-repeat;
+  background-position: 0 100%;
+  background-size: 0% 1.5px;
+  transition: background-size 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+  padding-bottom: 0.12em;
+}
+.link-draw:hover,
+.link-draw:focus-visible {
+  background-size: 100% 1.5px;
+}
+
+/* ==========================================================================
+   Leaf watermark
+
+   A quiet green leaf tucked into the corner of a card — the herbarium's own
+   ornament rather than a generic flourish. It sits under the content at low
+   opacity, is hidden from assistive technology, and turns a few degrees when
+   the card is hovered so the card feels alive rather than decorated.
+   ========================================================================== */
+
+.leaf-mark {
+  position: absolute;
+  pointer-events: none;
+  color: var(--marker);
+  opacity: 0.085;
+  transition:
+    transform 0.55s cubic-bezier(0.22, 1, 0.36, 1),
+    opacity 0.55s ease;
+}
+.group:hover .leaf-mark,
+.group:focus-within .leaf-mark,
+.lift:hover .leaf-mark,
+.lift:focus-within .leaf-mark {
+  transform: rotate(-7deg) scale(1.07);
+  opacity: 0.16;
+}
+/* on the dark canopy grounds the same mark has to lighten, not darken */
+.leaf-mark-light {
+  color: var(--marker-bright);
+  opacity: 0.13;
+}
+.group:hover .leaf-mark-light,
+.lift:hover .leaf-mark-light {
+  opacity: 0.22;
+}
+
+/* Everything above is opt-out. A reader who has asked their system for less
+   motion gets the page with the movement removed but nothing hidden: the
+   reveal transitions collapse to an instant, so `.is-visible` still arrives. */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    scroll-behavior: auto !important;
+    animation-duration: 0.01ms !important;
+    animation-delay: 0ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+  .marquee-track { animation: none !important; }
+  .lift:hover, .lift:focus-within { transform: none; }
+  .leaf-mark { transform: none !important; }
+}
+
+
+/* ==========================================================================
+   Payload website template support
+   ========================================================================== */
+
 @plugin "@tailwindcss/typography";
 
+/* Class names the template composes at runtime, invisible to Tailwind's scanner. */
 @source inline("lg:col-span-4");
 @source inline("lg:col-span-6");
 @source inline("lg:col-span-8");
@@ -37,16 +580,36 @@
 @source inline("border-warning");
 @source inline("bg-warning/30");
 
+@custom-variant sm (@media (width >= theme(--breakpoint-sm)));
+@custom-variant md (@media (width >= theme(--breakpoint-md)));
+@custom-variant lg (@media (width >= theme(--breakpoint-lg)));
+@custom-variant xl (@media (width >= theme(--breakpoint-xl)));
+@custom-variant 2xl (@media (width >= theme(--breakpoint-2xl)));
+
 @theme {
   --breakpoint-sm: 40rem;
   --breakpoint-md: 48rem;
   --breakpoint-lg: 64rem;
   --breakpoint-xl: 80rem;
   --breakpoint-2xl: 86rem;
-  --font-mono: var(--font-geist-mono);
-  --font-sans: var(--font-geist-sans);
 }
 
+/* State colours the herbarium palette does not define, kept in its register:
+   turmeric for warning, the same red as --destructive for error, canopy for
+   success — so template components do not import a second colour language. */
+:root {
+  --success: #2c6137;
+  --warning: #8f5210;
+  --error: #9c3210;
+}
+
+@theme inline {
+  --color-success: var(--success);
+  --color-warning: var(--warning);
+  --color-error: var(--error);
+}
+
+/* The template's blocks lay themselves out inside `.container`. */
 @layer utilities {
   .container {
     width: 100%;
@@ -63,7 +626,6 @@
   @variant md {
     .container {
       max-width: var(--breakpoint-md);
-      padding-inline: 2rem;
     }
   }
 
@@ -84,141 +646,4 @@
       max-width: var(--breakpoint-2xl);
     }
   }
-}
-
-:root {
-  --background: oklch(100% 0 0deg);
-  --foreground: oklch(14.5% 0 0deg);
-  --card: oklch(96.5% 0.005 265deg);
-  --card-foreground: oklch(14.5% 0 0deg);
-  --popover: oklch(100% 0 0deg);
-  --popover-foreground: oklch(14.5% 0 0deg);
-  --primary: oklch(20.5% 0 0deg);
-  --primary-foreground: oklch(98.5% 0 0deg);
-  --secondary: oklch(97% 0 0deg);
-  --secondary-foreground: oklch(20.5% 0 0deg);
-  --muted: oklch(97% 0 0deg);
-  --muted-foreground: oklch(55.6% 0 0deg);
-  --accent: oklch(97% 0 0deg);
-  --accent-foreground: oklch(20.5% 0 0deg);
-  --destructive: oklch(57.7% 0.245 27.325deg);
-  --destructive-foreground: oklch(57.7% 0.245 27.325deg);
-  --border: oklch(92.2% 0 0deg);
-  --input: oklch(92.2% 0 0deg);
-  --ring: oklch(70.8% 0 0deg);
-  --chart-1: oklch(64.6% 0.222 41.116deg);
-  --chart-2: oklch(60% 0.118 184.704deg);
-  --chart-3: oklch(39.8% 0.07 227.392deg);
-  --chart-4: oklch(82.8% 0.189 84.429deg);
-  --chart-5: oklch(76.9% 0.188 70.08deg);
-  --radius: 0.625rem;
-  --sidebar: oklch(98.5% 0 0deg);
-  --sidebar-foreground: oklch(14.5% 0 0deg);
-  --sidebar-primary: oklch(20.5% 0 0deg);
-  --sidebar-primary-foreground: oklch(98.5% 0 0deg);
-  --sidebar-accent: oklch(97% 0 0deg);
-  --sidebar-accent-foreground: oklch(20.5% 0 0deg);
-  --sidebar-border: oklch(92.2% 0 0deg);
-  --sidebar-ring: oklch(70.8% 0 0deg);
-  --success: oklch(78% 0.08 200deg);
-  --warning: oklch(89% 0.1 75deg);
-  --error: oklch(75% 0.15 25deg);
-}
-
-[data-theme='dark'] {
-  --background: oklch(14.5% 0 0deg);
-  --foreground: oklch(98.5% 0 0deg);
-  --card: oklch(17% 0 0deg);
-  --card-foreground: oklch(98.5% 0 0deg);
-  --popover: oklch(14.5% 0 0deg);
-  --popover-foreground: oklch(98.5% 0 0deg);
-  --primary: oklch(98.5% 0 0deg);
-  --primary-foreground: oklch(20.5% 0 0deg);
-  --secondary: oklch(26.9% 0 0deg);
-  --secondary-foreground: oklch(98.5% 0 0deg);
-  --muted: oklch(26.9% 0 0deg);
-  --muted-foreground: oklch(70.8% 0 0deg);
-  --accent: oklch(26.9% 0 0deg);
-  --accent-foreground: oklch(98.5% 0 0deg);
-  --destructive: oklch(39.6% 0.141 25.723deg);
-  --destructive-foreground: oklch(63.7% 0.237 25.331deg);
-  --border: oklch(26.9% 0 0deg);
-  --input: oklch(26.9% 0 0deg);
-  --ring: oklch(43.9% 0 0deg);
-  --chart-1: oklch(48.8% 0.243 264.376deg);
-  --chart-2: oklch(69.6% 0.17 162.48deg);
-  --chart-3: oklch(76.9% 0.188 70.08deg);
-  --chart-4: oklch(62.7% 0.265 303.9deg);
-  --chart-5: oklch(64.5% 0.246 16.439deg);
-  --sidebar: oklch(20.5% 0 0deg);
-  --sidebar-foreground: oklch(98.5% 0 0deg);
-  --sidebar-primary: oklch(48.8% 0.243 264.376deg);
-  --sidebar-primary-foreground: oklch(98.5% 0 0deg);
-  --sidebar-accent: oklch(26.9% 0 0deg);
-  --sidebar-accent-foreground: oklch(98.5% 0 0deg);
-  --sidebar-border: oklch(26.9% 0 0deg);
-  --sidebar-ring: oklch(43.9% 0 0deg);
-  --success: oklch(28% 0.1 200deg);
-  --warning: oklch(35% 0.08 70deg);
-  --error: oklch(45% 0.1 25deg);
-}
-
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --color-card: var(--card);
-  --color-card-foreground: var(--card-foreground);
-  --color-popover: var(--popover);
-  --color-popover-foreground: var(--popover-foreground);
-  --color-primary: var(--primary);
-  --color-primary-foreground: var(--primary-foreground);
-  --color-secondary: var(--secondary);
-  --color-secondary-foreground: var(--secondary-foreground);
-  --color-muted: var(--muted);
-  --color-muted-foreground: var(--muted-foreground);
-  --color-accent: var(--accent);
-  --color-accent-foreground: var(--accent-foreground);
-  --color-destructive: var(--destructive);
-  --color-destructive-foreground: var(--destructive-foreground);
-  --color-border: var(--border);
-  --color-input: var(--input);
-  --color-ring: var(--ring);
-  --color-chart-1: var(--chart-1);
-  --color-chart-2: var(--chart-2);
-  --color-chart-3: var(--chart-3);
-  --color-chart-4: var(--chart-4);
-  --color-chart-5: var(--chart-5);
-  --radius-sm: calc(var(--radius) - 4px);
-  --radius-md: calc(var(--radius) - 2px);
-  --radius-lg: var(--radius);
-  --radius-xl: calc(var(--radius) + 4px);
-  --color-sidebar: var(--sidebar);
-  --color-sidebar-foreground: var(--sidebar-foreground);
-  --color-sidebar-primary: var(--sidebar-primary);
-  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
-  --color-sidebar-accent: var(--sidebar-accent);
-  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
-  --color-sidebar-border: var(--sidebar-border);
-  --color-sidebar-ring: var(--sidebar-ring);
-  --color-success: var(--success);
-  --color-warning: var(--warning);
-  --color-error: var(--error);
-}
-
-@layer base {
-  * {
-    @apply border-border outline-ring/50;
-  }
-  body {
-    @apply bg-background text-foreground min-h-[100vh] flex flex-col;
-  }
-}
-
-html {
-  opacity: 0;
-}
-
-html[data-theme='dark'],
-html[data-theme='light'] {
-  opacity: initial;
 }

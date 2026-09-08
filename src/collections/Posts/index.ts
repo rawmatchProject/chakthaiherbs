@@ -41,6 +41,9 @@ export const Posts: CollectionConfig<'posts'> = {
   defaultPopulate: {
     title: true,
     slug: true,
+    excerpt: true,
+    authorLabel: true,
+    readingMinutes: true,
     categories: true,
     meta: {
       image: true,
@@ -76,6 +79,13 @@ export const Posts: CollectionConfig<'posts'> = {
       tabs: [
         {
           fields: [
+            {
+              // The old `Article.excerpt` — a required summary, used on the news
+              // index cards and as the SEO description fallback.
+              name: 'excerpt',
+              type: 'textarea',
+              required: true,
+            },
             {
               name: 'heroImage',
               type: 'upload',
@@ -125,9 +135,22 @@ export const Posts: CollectionConfig<'posts'> = {
               type: 'relationship',
               admin: {
                 position: 'sidebar',
+                description: 'news / knowledge / announcement — the old ArticleCategory enum.',
               },
               hasMany: true,
               relationTo: 'categories',
+            },
+            {
+              // `Article.authorLabel` — a printed byline ("คณะพยาบาลศาสตร์ ..."),
+              // not a Payload user. Kept separate from `authors`.
+              name: 'authorLabel',
+              type: 'text',
+              admin: { position: 'sidebar' },
+            },
+            {
+              name: 'readingMinutes',
+              type: 'number',
+              admin: { position: 'sidebar' },
             },
           ],
           label: 'Meta',
