@@ -4,6 +4,7 @@ import { redirectsPlugin } from '@payloadcms/plugin-redirects'
 import { seoPlugin } from '@payloadcms/plugin-seo'
 import { searchPlugin } from '@payloadcms/plugin-search'
 import { vercelBlobStorage } from '@payloadcms/storage-vercel-blob'
+import { privateBlobStorage } from './private-blob'
 import { Plugin } from 'payload'
 import { revalidateRedirects } from '@/hooks/revalidateRedirects'
 import { GenerateTitle, GenerateURL } from '@payloadcms/plugin-seo/types'
@@ -25,14 +26,17 @@ const generateURL: GenerateURL<Post | Page> = ({ doc }) => {
 }
 
 export const plugins: Plugin[] = [
-  vercelBlobStorage({
-    collections: {
-      media: true,
-    },
-    token: process.env.BLOB_READ_WRITE_TOKEN,
-    clientUploads: true,
-    alwaysInsertFields: true,
-  }),
+  // The production store is private. Public stores can opt into the stock adapter.
+  process.env.BLOB_ACCESS === 'public'
+    ? vercelBlobStorage({
+        collections: {
+          media: true,
+        },
+        token: process.env.BLOB_READ_WRITE_TOKEN,
+        clientUploads: true,
+        alwaysInsertFields: true,
+      })
+    : privateBlobStorage(process.env.BLOB_READ_WRITE_TOKEN),
   redirectsPlugin({
     collections: ['pages', 'posts'],
     overrides: {
